@@ -1,4 +1,3 @@
-# Konveyor DGI code2graph
 ```
    _____            _        ___    _____                     _     
   / ____|          | |      |__ \  / ____|                   | |    
@@ -10,12 +9,17 @@
                                                       |_|           
 ```
 
-Native WALA implementation of code2graph for [konveyor/data-gravity-insights](https://github.com/konveyor/tackle-data-gravity-insights)
+# dgi-code-analyzer
+Native WALA implementation of source code analysis tool for Enterprise Java Applications.
+
+
+## Code of Conduct
+Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community/blob/main/CODE_OF_CONDUCT.md).
+
 
 ## Prequisits 
 
 - Java 11
-- Optionally, graphviz (for visualization)
 
 ## Usage
 
