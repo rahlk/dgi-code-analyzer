@@ -75,7 +75,7 @@ public class SDG2JSON {
                 }));
         return graph;
     }
-    public static void convert2JSON(SDG<? extends InstanceKey> sdg, File output) {
+    public static void convert(SDG<? extends InstanceKey> sdg, CallGraph cg, String outDir) {
         // Prune the Graph to keep only application classes.
         Log.info("Pruning SDG to keep only Application classes.");
         Graph<Statement> prunedGraph = GraphSlicer.prune(sdg,
@@ -101,7 +101,7 @@ public class SDG2JSON {
                                             prunedGraph,
                                             (p, s) -> String.valueOf(sdg.getEdgeLabels(p, s).iterator().next()));
 
-
+        // Save the SDG as JSON
         JSONExporter<Node, Edge> exporter = new JSONExporter<>(v -> String.valueOf(v.getId()));
         exporter.setVertexAttributeProvider((v) -> {
             Map<String, Attribute> map = new LinkedHashMap<>();
@@ -117,9 +117,10 @@ public class SDG2JSON {
             map.put("context", DefaultAttribute.createAttribute(e.getContext()));
             return map;
         });
-        // Export the graph to JSON
-        exporter.exportGraph(graph, output);
+        Log.debug(outDir);
+        exporter.exportGraph(graph, new File(outDir, "sdg.json"));
 
-
+        // Save the callgraph
+        CallGraphUtil.convert2JSON(cg, outDir);
     }
 }

@@ -65,19 +65,7 @@ public class CallGraphUtil {
         return graph;
     }
 
-    public static void convert2GraphML(CallGraph callGraph, String outPath, String outFile) {
-        Graph<ClassNode, CallGraphEdge> graph = getDefaultDirectedGraph(callGraph);
-        GraphMLExporter<ClassNode, CallGraphEdge> exporter = new GraphMLExporter<>(v -> v.className);
-        exporter.setVertexAttributeProvider((v) -> {
-            Map<String, Attribute> map = new LinkedHashMap<>();
-            map.put("label", DefaultAttribute.createAttribute(v.toString()));
-            return map;
-        });
-        // Export the graph to GraphML
-        exporter.exportGraph(graph, new File(outPath, outFile));
-    }
-
-    public static void convert2JSON(CallGraph callGraph, String outPath, String outFile) {
+    public static void convert2JSON(CallGraph callGraph, String outDir) {
         Graph<ClassNode, CallGraphEdge> graph = getDefaultDirectedGraph(callGraph);
         JSONExporter<ClassNode, CallGraphEdge> exporter = new JSONExporter<>(v -> v.className);
         exporter.setVertexAttributeProvider((v) -> {
@@ -86,18 +74,7 @@ public class CallGraphUtil {
             return map;
         });
         // Export the graph to JSON
-        exporter.exportGraph(graph, new File(outPath, outFile));
+        exporter.exportGraph(graph, new File(outDir, "callgraph.json"));
     }
 
-    public static void convert2DOT(CallGraph callGraph, String outPath, String outFile) {
-        Graph<ClassNode, CallGraphEdge> graph = getDefaultDirectedGraph(callGraph);
-        DOTExporter<ClassNode, CallGraphEdge> exporter = new DOTExporter<>(v -> v.classShortName);
-        exporter.setVertexAttributeProvider((v) -> {
-            Map<String, Attribute> map = new LinkedHashMap<>();
-            map.put("label", DefaultAttribute.createAttribute(v.toString()));
-            return map;
-        });
-        // Export the graph to DOT
-        exporter.exportGraph(graph, new File(outPath, outFile));
-    }
 }
