@@ -13,6 +13,7 @@ limitations under the License.
 
 package org.konveyor.dgi.code2graph.utils;
 
+
 import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.classLoader.BinaryDirectoryTreeModule;
 import com.ibm.wala.classLoader.JarFileModule;
@@ -20,44 +21,54 @@ import com.ibm.wala.ipa.callgraph.AnalysisScope;
 import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.config.FileOfClasses;
+import org.apache.commons.io.FileUtils;
+import org.konveyor.dgi.code2graph.utils.JarUtils;
+import org.konveyor.dgi.code2graph.utils.Log;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.jar.JarFile;
 
 public class ScopeUtils {
 
   public static String[] stdLibs;
+  // I am not including any exclusions for now.
   private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
-      + "javax\\/awt\\/.*\n"
-      + "javax\\/swing\\/.*\n"
-      + "sun\\/.*\n"
-      + /* "com\\/.*\n" + */ "jdk\\/.*\n"
-      + "oracle\\/.*\n"
-      + "apple\\/.*\n"
-      + "netscape\\/.*\n"
-      + "javafx\\/.*\n"
-      + "org\\/w3c\\/.*\n"
-      + "org\\/xml\\/.*\n"
-      + "org\\/jcp\\/.*\n"
-      + "org\\/ietf\\/.*\n"
-      + "org\\/omg\\/.*\n"
-      + "java\\/security\\/.*\n"
-      + "java\\/beans\\/.*\n"
-      + "java\\/time\\/.*\n"
-      + "java\\/text\\/.*\n"
-      + "java\\/net\\/.*\n"
-      + "java\\/nio\\/.*\n" /* + "java\\/io\\/.*\n" */
-      + "java\\/math\\/.*\n"
-      + "java\\/applet\\/.*\n"
-      + "java\\/rmi\\/.*\n"
-      + "org\\/apache\\/.*\n"
-      + "";
+          + "javax\\/awt\\/.*\n"
+          + "javax\\/swing\\/.*\n"
+          + "sun\\/.*\n"
+          + /* "com\\/.*\n" + */ "jdk\\/.*\n"
+          + "oracle\\/.*\n"
+          + "apple\\/.*\n"
+          + "netscape\\/.*\n"
+          + "javafx\\/.*\n"
+          + "org\\/w3c\\/.*\n"
+          + "org\\/xml\\/.*\n"
+          + "org\\/jcp\\/.*\n"
+          + "org\\/ietf\\/.*\n"
+          + "org\\/omg\\/.*\n"
+          + "java\\/security\\/.*\n"
+          + "java\\/beans\\/.*\n"
+          + "java\\/time\\/.*\n"
+          + "java\\/text\\/.*\n"
+          + "java\\/net\\/.*\n"
+          + "java\\/nio\\/.*\n" /* + "java\\/io\\/.*\n" */
+          + "java\\/math\\/.*\n"
+          + "java\\/applet\\/.*\n"
+          + "java\\/rmi\\/.*\n"
+          + "org\\/apache\\/.*\n"
+          + "";
+
 
   /**
    * Create an analysis scope base on the input
@@ -65,20 +76,40 @@ public class ScopeUtils {
    * @param inputs Directories to consider for scope creation.
    * @return scope The created analysis scope
    * @throws IOException
+   * @throws URISyntaxException
    */
-  public static AnalysisScope createScope(String inputs) throws IOException {
+
+  public static AnalysisScope createScope(String inputs, String extraLibs) throws IOException, URISyntaxException {
     Log.info("Create analysis scope.");
     AnalysisScope scope = new JavaSourceAnalysisScope();
     scope = addDefaultExclusions(scope);
-    // add standard libraries to scope
+
+    Log.info("Loading Java SE standard libs.");
     String[] stdlibs = WalaProperties.getJ2SEJarFiles();
     for (String stdlib : stdlibs) {
       scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
     }
     setStdLibs(stdlibs);
 
-    String tmpDirString = System.getProperty("java.io.tmpdir");
+    // -------------------------------------
+    // Add extra user provided JARS to scope
+    // -------------------------------------
+    if (!(extraLibs == null)) {
+      Log.info("Loading user specified extra libs.");
+      File[] listOfExtraLibs = new File(extraLibs).listFiles();
+      for (File extraLibJar : listOfExtraLibs) {
+        Log.info("↪ Adding " + extraLibJar + " to scope.");
+        scope.addToScope(ClassLoaderReference.Primordial, new JarFile(extraLibJar.getAbsolutePath()));
+      }
+    } else {
+      Log.warn("No extra libraries to process.");
+    }
+
+    Path path = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), UUID.randomUUID().toString());
+    String tmpDirString = Files.createDirectories(path).toFile().getAbsolutePath();
     Path workDir = Paths.get(tmpDirString);
+//    Log.debug("Unpacking *.{jar, war, ear} to " + workDir);
+    FileUtils.cleanDirectory(workDir.toFile());
     List<String> classRoots = new ArrayList<>();
     List<String> jars = new ArrayList<>();
 
@@ -96,7 +127,7 @@ public class ScopeUtils {
 
     for (String classRoot : classRoots) {
       scope.addToScope(
-          ClassLoaderReference.Application, new BinaryDirectoryTreeModule(new File(classRoot)));
+              ClassLoaderReference.Application, new BinaryDirectoryTreeModule(new File(classRoot)));
     }
     for (String jar : jars) {
       scope.addToScope(ClassLoaderReference.Application, new JarFileModule(new JarFile(jar)));
@@ -105,7 +136,7 @@ public class ScopeUtils {
   }
 
   private static AnalysisScope addDefaultExclusions(AnalysisScope scope)
-      throws UnsupportedEncodingException, IOException {
+          throws UnsupportedEncodingException, IOException {
     Log.info("Add exclusions to scope.");
     scope.setExclusions(new FileOfClasses(new ByteArrayInputStream(EXCLUSIONS.getBytes("UTF-8"))));
     return scope;
