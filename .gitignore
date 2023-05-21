@@ -201,3 +201,7 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/intellij,gradle,java,visualstudiocode
 .idea
 .DS_Store
+
+# Don't ignore
+!etc/**/binary/*
+!etc/**/libs/*

@@ -65,15 +65,6 @@ public class Code2Graph {
     CommandLineParser parser = new DefaultParser();
 
     CommandLine cmd = null;
-    String logo = "   \n" +
-            "   _____            _        ___    _____                     _     \n" +
-            "  / ____|          | |      |__ \\  / ____|                   | |    \n" +
-            " | |      ___    __| |  ___    ) || |  __  _ __  __ _  _ __  | |__  \n" +
-            " | |     / _ \\  / _` | / _ \\  / / | | |_ || '__|/ _` || '_ \\ | '_ \\ \n" +
-            " | |____| (_) || (_| ||  __/ / /_ | |__| || |  | (_| || |_) || | | |\n" +
-            "  \\_____|\\___/  \\__,_| \\___||____| \\_____||_|   \\__,_|| .__/ |_| |_|\n" +
-            "                                                      | |           \n" +
-            "                                                      |_|           \n\n";
     String usage = "usage: ./code2graph [-h] [-i <arg>] [-e <arg>] [-o <arg>] [-q]";
     String header = "\nConvert java binary (*.jar, *.ear, *.war) to its equivalent system dependency graph.\n\n";
     HelpFormatter hf = new HelpFormatter();
@@ -82,7 +73,7 @@ public class Code2Graph {
     try {
       cmd = parser.parse(options, args);
       if (cmd.hasOption("help")) {
-        hf.printHelp(logo+usage, header, options, null, false);
+        hf.printHelp(usage, header, options, null, false);
         System.exit(0);
       }
       if (cmd.hasOption("quiet")) {
