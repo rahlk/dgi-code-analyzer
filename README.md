@@ -1,6 +1,33 @@
-# dgi-code-analyzer
+# DGI Code Analyzer
+
 Native WALA implementation of source code analysis tool for Enterprise Java Applications.
 
+```
+                                                                                                                                                                                                                                        
+                                                  dddddddd                                                                                                                                                                              
+        CCCCCCCCCCCCC                             d::::::d                                 AAA                                                 lllllll                                                                                  
+     CCC::::::::::::C                             d::::::d                                A:::A                                                l:::::l                                                                                  
+   CC:::::::::::::::C                             d::::::d                               A:::::A                                               l:::::l                                                                                  
+  C:::::CCCCCCCC::::C                             d:::::d                               A:::::::A                                              l:::::l                                                                                  
+ C:::::C       CCCCCC   ooooooooooo       ddddddddd:::::d     eeeeeeeeeeee             A:::::::::A         nnnn  nnnnnnnn      aaaaaaaaaaaaa    l::::lyyyyyyy           yyyyyyyzzzzzzzzzzzzzzzzz    eeeeeeeeeeee    rrrrr   rrrrrrrrr   
+C:::::C               oo:::::::::::oo   dd::::::::::::::d   ee::::::::::::ee          A:::::A:::::A        n:::nn::::::::nn    a::::::::::::a   l::::l y:::::y         y:::::y z:::::::::::::::z  ee::::::::::::ee  r::::rrr:::::::::r  
+C:::::C              o:::::::::::::::o d::::::::::::::::d  e::::::eeeee:::::ee       A:::::A A:::::A       n::::::::::::::nn   aaaaaaaaa:::::a  l::::l  y:::::y       y:::::y  z::::::::::::::z  e::::::eeeee:::::eer:::::::::::::::::r 
+C:::::C              o:::::ooooo:::::od:::::::ddddd:::::d e::::::e     e:::::e      A:::::A   A:::::A      nn:::::::::::::::n           a::::a  l::::l   y:::::y     y:::::y   zzzzzzzz::::::z  e::::::e     e:::::err::::::rrrrr::::::r
+C:::::C              o::::o     o::::od::::::d    d:::::d e:::::::eeeee::::::e     A:::::A     A:::::A       n:::::nnnn:::::n    aaaaaaa:::::a  l::::l    y:::::y   y:::::y          z::::::z   e:::::::eeeee::::::e r:::::r     r:::::r
+C:::::C              o::::o     o::::od:::::d     d:::::d e:::::::::::::::::e     A:::::AAAAAAAAA:::::A      n::::n    n::::n  aa::::::::::::a  l::::l     y:::::y y:::::y          z::::::z    e:::::::::::::::::e  r:::::r     rrrrrrr
+C:::::C              o::::o     o::::od:::::d     d:::::d e::::::eeeeeeeeeee     A:::::::::::::::::::::A     n::::n    n::::n a::::aaaa::::::a  l::::l      y:::::y:::::y          z::::::z     e::::::eeeeeeeeeee   r:::::r            
+ C:::::C       CCCCCCo::::o     o::::od:::::d     d:::::d e:::::::e             A:::::AAAAAAAAAAAAA:::::A    n::::n    n::::na::::a    a:::::a  l::::l       y:::::::::y          z::::::z      e:::::::e            r:::::r            
+  C:::::CCCCCCCC::::Co:::::ooooo:::::od::::::ddddd::::::dde::::::::e           A:::::A             A:::::A   n::::n    n::::na::::a    a:::::a l::::::l       y:::::::y          z::::::zzzzzzzze::::::::e           r:::::r            
+   CC:::::::::::::::Co:::::::::::::::o d:::::::::::::::::d e::::::::eeeeeeee  A:::::A               A:::::A  n::::n    n::::na:::::aaaa::::::a l::::::l        y:::::y          z::::::::::::::z e::::::::eeeeeeee   r:::::r            
+     CCC::::::::::::C oo:::::::::::oo   d:::::::::ddd::::d  ee:::::::::::::e A:::::A                 A:::::A n::::n    n::::n a::::::::::aa:::al::::::l       y:::::y          z:::::::::::::::z  ee:::::::::::::e   r:::::r            
+        CCCCCCCCCCCCC   ooooooooooo      ddddddddd   ddddd    eeeeeeeeeeeeeeAAAAAAA                   AAAAAAAnnnnnn    nnnnnn  aaaaaaaaaa  aaaallllllll      y:::::y           zzzzzzzzzzzzzzzzz    eeeeeeeeeeeeee   rrrrrrr            
+                                                                                                                                                            y:::::y                                                                     
+                                                                                                                                                           y:::::y                                                                      
+                                                                                                                                                          y:::::y                                                                       
+                                                                                                                                                         y:::::y                                                                        
+                                                                                                                                                        yyyyyyy                                                                         
+                                                                                                                                                                                                                                        
+```                                                                                                                                                                                                                                        
 
 ## Code of Conduct
 Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community/blob/main/CODE_OF_CONDUCT.md).
@@ -13,14 +40,6 @@ Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community
 ## Usage
 
 ```man
-   _____            _        ___    _____                     _     
-  / ____|          | |      |__ \  / ____|                   | |    
- | |      ___    __| |  ___    ) || |  __  _ __  __ _  _ __  | |__  
- | |     / _ \  / _` | / _ \  / / | | |_ || '__|/ _` || '_ \ | '_ \ 
- | |____| (_) || (_| ||  __/ / /_ | |__| || |  | (_| || |_) || | | |
-  \_____|\___/  \__,_| \___||____| \_____||_|   \__,_|| .__/ |_| |_|
-                                                      | |           
-                                                      |_|           
                                                       
 usage: ./code2graph [-h] [-i <arg>] [-e <arg>] [-o <arg>] [-q]
 
