@@ -93,3 +93,13 @@ task copyDependencies(type: Copy) {
   from configurations.default
   into 'dependencies'
 }
+
+//task copyDependencies(type: Copy) {
+//    doFirst {
+//        if (!project.hasProperty('libDir')) {
+//            throw new GradleException("You must provide a property 'libDir' pointing to the directory for the libraries.")
+//        }
+//        from configurations.runtimeClasspath
+//        into project.property('libDir')
+//    }
+//}

@@ -70,13 +70,8 @@ public class Graph2JSON {
                             && !p.getNode().getMethod().equals(s.getNode().getMethod())) {
 
                         // Build source and destination nodes
-                        MethodNode source = new MethodNode(
-                                p.getNode().getMethod().getName().toString(),
-                                p.getNode().getMethod().getDeclaringClass().getName().toString());
-                        MethodNode target = new MethodNode(
-                                s.getNode().getMethod().getName().toString(),
-                                s.getNode().getMethod().getDeclaringClass().getName().toString());
-
+                        MethodNode source = new MethodNode(p.getNode().getMethod());
+                        MethodNode target = new MethodNode(s.getNode().getMethod());
 
                         // Add the nodes to the graph as vertices
                         graph.addVertex(source);
@@ -98,18 +93,13 @@ public class Graph2JSON {
 
         callGraph.getEntrypointNodes()
                 .forEach(p -> {
-                    IMethod entryMethod = p.getMethod();
                     // Get call statements that may execute in a given method
                     Iterator<CallSiteReference> outGoingCalls = p.iterateCallSites();
                     outGoingCalls.forEachRemaining( n -> {
                         callGraph.getPossibleTargets(p, n).stream().filter(o -> AnalysisUtils.isApplicationClass(o.getMethod().getDeclaringClass()))
                                 .forEach(o -> {
-                            MethodNode source = new MethodNode(
-                                    entryMethod.getName().toString(),
-                                    entryMethod.getDeclaringClass().getName().toString());
-                            MethodNode target = new MethodNode(
-                                    o.getMethod().getName().toString(),
-                                    o.getMethod().getDeclaringClass().getName().toString());
+                            MethodNode source = new MethodNode(p.getMethod());
+                            MethodNode target = new MethodNode(o.getMethod());
                             if (!source.equals(target)) {
                                 graph.addVertex(source);
                                 graph.addVertex(target);
