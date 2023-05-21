@@ -15,15 +15,13 @@ package org.konveyor.dgi.code2graph;
 
 import com.ibm.wala.cast.ir.ssa.AstIRFactory;
 import com.ibm.wala.cast.java.client.impl.ZeroOneCFABuilderFactory;
+import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.cast.java.ipa.modref.AstJavaModRef;
 import com.ibm.wala.cast.java.translator.jdt.ecj.ECJClassLoaderFactory;
-import com.ibm.wala.ipa.callgraph.AnalysisCacheImpl;
-import com.ibm.wala.ipa.callgraph.AnalysisOptions;
+import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
-import com.ibm.wala.ipa.callgraph.AnalysisScope;
-import com.ibm.wala.ipa.callgraph.CallGraph;
-import com.ibm.wala.ipa.callgraph.Entrypoint;
-import com.ibm.wala.ipa.callgraph.IAnalysisCacheView;
+import com.ibm.wala.ipa.cfg.BasicBlockInContext;
+import com.ibm.wala.ipa.cfg.InterproceduralCFG;
 import com.ibm.wala.ipa.slicer.*;
 
 import com.ibm.wala.ssa.*;
@@ -32,8 +30,15 @@ import com.ibm.wala.ipa.callgraph.propagation.PropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.util.collections.FilterIterator;
+import com.ibm.wala.util.graph.Graph;
+import com.ibm.wala.util.graph.GraphSlicer;
 import org.apache.commons.cli.*;
 import org.konveyor.dgi.code2graph.utils.*;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.function.Supplier;
 
 public class Code2Graph {
 
@@ -139,13 +144,17 @@ public class Code2Graph {
               Slicer.DataDependenceOptions.NO_HEAP_NO_EXCEPTIONS,
               Slicer.ControlDependenceOptions.NO_EXCEPTIONAL_EDGES);
 
-
       Log.done("Built SDG. Took " + (System.currentTimeMillis() - start_time) + " seconds.");
 
-      // Save SDG as JSON
+      // Build IPCFG
+      InterproceduralCFG ipcfg_full = new InterproceduralCFG(callGraph,
+              n -> n.getMethod().getReference().getDeclaringClass().getClassLoader() == JavaSourceAnalysisScope.SOURCE
+                      || n == callGraph.getFakeRootNode() || n == callGraph.getFakeWorldClinitNode());
+
+      // Save SDG, IPCFG, and Call graph as JSON
       Log.info("Saving the system dependency graph");
-      SDG2JSON.convert(sdg, callGraph, outDir);
-      Log.done("Callgraph and SDG saved at " + outDir);
+      Graph2JSON.convert(sdg, callGraph, ipcfg_full, outDir);
+      Log.done("SDG saved at " + outDir);
 
     } catch (ClassHierarchyException | IllegalArgumentException | NullPointerException che) {
       che.printStackTrace();

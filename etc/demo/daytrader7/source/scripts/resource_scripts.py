@@ -81,15 +81,15 @@ def getCellId ():
 #endDef
 
 #-----------------------------------------------------------------
-# getNodeId - Return the node id of the existing node if in a single
+# getNodeId - Return the statementNode id of the existing statementNode if in a single
 #           server environment. If in an ND environment query the
-#           user to determine desired node.
+#           user to determine desired statementNode.
 #-----------------------------------------------------------------
 def getNodeId (prompt):
 	nodeList = AdminConfig.list("Node").split("\n")
 
 	if (len(nodeList) == 1):
-		node = nodeList[0]
+		statementNode = nodeList[0]
 	else:
 		print ""
 		print "Available Nodes:"
@@ -106,16 +106,16 @@ def getNodeId (prompt):
 
 		DefaultNode = nodeNameList[0]
 		if (prompt == ""):
-			prompt = "Select the desired node"
+			prompt = "Select the desired statementNode"
 		#endIf
 
 		nodeName = getValidInput(prompt+" ["+DefaultNode+"]:", DefaultNode, nodeNameList )
 
 		index = nodeNameList.index(nodeName)
-		node = nodeList[index]
+		statementNode = nodeList[index]
 	#endElse
 
-	return node
+	return statementNode
 #endDef
 
 #-----------------------------------------------------------------
@@ -171,7 +171,7 @@ def getServer1Id ():
 #endDef
 
 #-----------------------------------------------------------------
-# getNodeIdFromServerId - Return the node id based on the node
+# getNodeIdFromServerId - Return the statementNode id based on the statementNode
 #            name found within the server id
 #-----------------------------------------------------------------
 def getNodeIdFromServerId (serverId):
@@ -311,7 +311,7 @@ def createJDBCProvider (provider, XA, scopeId, path, nativePath):
 	providerId = ""
 	if (scope == "cell"):
 		providerId = AdminConfig.getid("/Cell:"+scopeName+"/JDBCProvider:\""+name+"\"/" )
-	elif (scope == "node"):
+	elif (scope == "statementNode"):
 		providerId = AdminConfig.getid("/Node:"+scopeName+"/JDBCProvider:\""+name+"\"/" )
 	elif (scope == "server"):
 		providerId = AdminConfig.getid("/Server:"+scopeName+"/JDBCProvider:\""+name+"\"/" )
@@ -647,7 +647,7 @@ def addSIBusMember ( busId, fileStore, targetArgs, dataStoreArgs ):
 	#    busName          - SIBus name
 	#    fileStore [0]    - create file store, otherwise create data store
  	#    fileStore [1]    - logDirectory - directory where fileStore is located (only used if fileStore[0] = true)
-	#    targetArgs[0]    - cluster name or node name
+	#    targetArgs[0]    - cluster name or statementNode name
 	#    targetArgs[1]    - server name
 	#    dataStoreArgs[0] - defaultDS - create default DS (true|false)
 	#    dataStoreArgs[1] - dsJndi - jndi name of the datastore (only used if defaultDS = false)
@@ -677,10 +677,10 @@ def addSIBusMember ( busId, fileStore, targetArgs, dataStoreArgs ):
 		for item in busMembers:
 			item = item.rstrip()
 			cluster = AdminConfig.showAttribute(item, "cluster" )
-			node = AdminConfig.showAttribute(item, "node" )
+			statementNode = AdminConfig.showAttribute(item, "statementNode" )
 			server = AdminConfig.showAttribute(item, "server" )
 
-			if (cluster == clusterName  or ( server == serverName  and node == nodeName ) ):
+			if (cluster == clusterName  or ( server == serverName  and statementNode == nodeName ) ):
 				member = item
 				break
 			#endIf
@@ -694,7 +694,7 @@ def addSIBusMember ( busId, fileStore, targetArgs, dataStoreArgs ):
 			parms = ["-bus", busName, "-cluster", clusterName]
 		else:
 			print "Adding SIBus member " + nodeName + " - " + serverName + "..."
-			parms = ["-bus", busName, "-node", nodeName, "-server", serverName]
+			parms = ["-bus", busName, "-statementNode", nodeName, "-server", serverName]
 		#endElse
 
 		print "  File Store:            " + fileStore[0]
@@ -734,7 +734,7 @@ def createMessageEngine ( busId, defaultDS, dsJndi, optArgs ):
 	#    busName     - SIBus name
 	#    defaultDS   - create default DS (true|false)
 	#    dsJndi      - jndi name of the datasource (only used if defaultDS = false)
-	#    optArgs[0]  - node name or cluster name
+	#    optArgs[0]  - statementNode name or cluster name
 	#    optArgs[1]  - server name
 
 	defaultDS = defaultDS.lower()
@@ -764,7 +764,7 @@ def createMessageEngine ( busId, defaultDS, dsJndi, optArgs ):
 	if (len(optArgs) == 1):
 		parms = ["-bus", busName, "-cluster", clusterName, "-createDefaultDatasource", defaultDS]
 	else:
-		parms = ["-bus", busName, "-node", nodeName, "-server", serverName, "-createDefaultDatasource", defaultDS]
+		parms = ["-bus", busName, "-statementNode", nodeName, "-server", serverName, "-createDefaultDatasource", defaultDS]
 	#endElse
 
 	if (defaultDS == "false"):
@@ -817,7 +817,7 @@ def createSIBDestination ( busId, destName, destType, reliability, optArgs ):
 	#    destName    - destination name
 	#    destType    - destination type
 	#    reliability - reliability
-	#    optArgs[0]  - cluster name or node name
+	#    optArgs[0]  - cluster name or statementNode name
 	#    optArgs[1]  - server name
 
 	if (len(optArgs) == 1):
@@ -862,7 +862,7 @@ def createSIBDestination ( busId, destName, destType, reliability, optArgs ):
 			elif (len(optArgs) == 2):
 				print "  Node Name:         " + nodeName
 				print "  Server Name:       " + serverName
-				parms.append("-node")
+				parms.append("-statementNode")
 				parms.append(nodeName)
 				parms.append("-server")
 				parms.append(serverName)
@@ -1274,7 +1274,7 @@ def addHostAliasToDefaultHost ( port ):
 #-----------------------------------------------------------------
 def createServer ( serverName, nodeName ):
 	#    serverName - server name
-	#    nodeName   - node name
+	#    nodeName   - statementNode name
 
 	print " "
 	print "Creating Server " + serverName + "..."
@@ -1287,7 +1287,7 @@ def createServer ( serverName, nodeName ):
 		print "  Server Name:  " + serverName
 		print "  Node Name:    " + nodeName
 
-		node = AdminConfig.getid("/Node:"+nodeName+"/" )
+		statementNode = AdminConfig.getid("/Node:"+nodeName+"/" )
 
 		templateList = AdminConfig.listTemplates("Server","APPLICATION_SERVER")
 		template = ""
@@ -1300,7 +1300,7 @@ def createServer ( serverName, nodeName ):
 		#endFor                
 
 		attrs = [["name", serverName]]
-		server = AdminConfig.createUsingTemplate("Server", node, attrs, template )
+		server = AdminConfig.createUsingTemplate("Server", statementNode, attrs, template )
                 
 		print serverName + " created successfully!"
 	else:
@@ -1359,7 +1359,7 @@ def createCluster ( clusterName, preferLocal, description, cell ):
 #-----------------------------------------------------------------
 def createClusterMember ( memberName, nodeId, weight, clusterId ):
 	#    memberName - member name
-	#    node       - node
+	#    statementNode       - statementNode
 	#    weight     - weight
 	#    cluster    - cluster
 
@@ -1386,7 +1386,7 @@ def createClusterMember ( memberName, nodeId, weight, clusterId ):
 		print "  Cluster:      " + getName(clusterId)
 
 		attrs = [["memberName", memberName], ["weight", weight]]
-		member = AdminConfig.createClusterMember(cluster, node, attrs )
+		member = AdminConfig.createClusterMember(cluster, statementNode, attrs )
         
 		print memberName + " created successfully!"
 	else:
@@ -1409,7 +1409,7 @@ def installApp ( appName, ear, deployejb, deployws, defaultBindings, earMetaData
 	#    reloadEnabled   - check filesystem to reload changed files (true|false)
 	#    earMetaData     - use MetaData from ear (true|false)
 	#    dbType          - ejb deploy db type
-	#    target[0]       - node name or cluster name
+	#    target[0]       - statementNode name or cluster name
 	#    target[1]       - server name
 
 	print ""
@@ -1440,9 +1440,9 @@ def installApp ( appName, ear, deployejb, deployws, defaultBindings, earMetaData
 			cluster = target[0]
 			print "  Target Cluster:        " + cluster
 		else:
-			node = target[0]
+			statementNode = target[0]
 			server = target[1]
-			print "  Target Node:           " + node
+			print "  Target Node:           " + statementNode
 			print "  Target Server:         " + server
 		#endElse
 		print "  Deploy EJB:            " + deployejb
@@ -1475,7 +1475,7 @@ def installApp ( appName, ear, deployejb, deployws, defaultBindings, earMetaData
 		if (len(target) == 1):
 			parms += " -cluster " + cluster
 		else:
-			parms += " -node " + node + " -server " + server
+			parms += " -statementNode " + statementNode + " -server " + server
 		#endElse
 
 		parms1 = [parms]

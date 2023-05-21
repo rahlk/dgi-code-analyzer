@@ -45,10 +45,10 @@ SilentInstall = "true"
 #---------------------------------------------------------------------
 
 # Silent install properties for Managed Node
-# - Modify these properties to specify the target node and server
+# - Modify these properties to specify the target statementNode and server
 #TargetNodeName =   "AppSrv01"
 #TargetServerName = "server1"
-# - Or uncomment the following lines to detect the server and node names
+# - Or uncomment the following lines to detect the server and statementNode names
 TargetNodeName =   getName(getNodeId(""))
 TargetServerName = getName(getServerId(""))
 
@@ -221,14 +221,14 @@ scope = ""
 if (SilentInstall == "false" and ( operation == "configure" or operation == "all") ):
 	SecurityEnabled = getValidInput("Global security is (or will be) enabled (true|false) ["+SecurityEnabled+"]:", SecurityEnabled, BooleanOptions )
 
-	# Obtain node name and id for scope
+	# Obtain statementNode name and id for scope
 	print "------------------------------------------------"
 	print " Collecting Single Server or Managed Server Info"
 	print "" 
         
-	node = getNodeId("")
-	TargetNodeName = getName(node )
-	scope = node
+	statementNode = getNodeId("")
+	TargetNodeName = getName(statementNode )
+	scope = statementNode
 
 	server = getServerId("")
 	TargetServerName = getName(server )
