@@ -65,14 +65,24 @@ public class Code2Graph {
     CommandLineParser parser = new DefaultParser();
 
     CommandLine cmd = null;
-
-    String header = "Convert java binary (*.jar, *.ear, *.war) to its equivalent system dependency graph.\n\n";
+    String logo = "   \n" +
+            "   _____            _        ___    _____                     _     \n" +
+            "  / ____|          | |      |__ \\  / ____|                   | |    \n" +
+            " | |      ___    __| |  ___    ) || |  __  _ __  __ _  _ __  | |__  \n" +
+            " | |     / _ \\  / _` | / _ \\  / / | | |_ || '__|/ _` || '_ \\ | '_ \\ \n" +
+            " | |____| (_) || (_| ||  __/ / /_ | |__| || |  | (_| || |_) || | | |\n" +
+            "  \\_____|\\___/  \\__,_| \\___||____| \\_____||_|   \\__,_|| .__/ |_| |_|\n" +
+            "                                                      | |           \n" +
+            "                                                      |_|           \n\n";
+    String usage = "usage: ./code2graph [-h] [-i <arg>] [-e <arg>] [-o <arg>] [-q]";
+    String header = "\nConvert java binary (*.jar, *.ear, *.war) to its equivalent system dependency graph.\n\n";
     HelpFormatter hf = new HelpFormatter();
+    hf.setSyntaxPrefix("");
 
     try {
       cmd = parser.parse(options, args);
       if (cmd.hasOption("help")) {
-        hf.printHelp("./code2graph", header, options, null, true);
+        hf.printHelp(logo+usage, header, options, null, false);
         System.exit(0);
       }
       if (cmd.hasOption("quiet")) {
@@ -131,12 +141,10 @@ public class Code2Graph {
       long start_time = System.currentTimeMillis();
       PropagationCallGraphBuilder builder = new ZeroOneCFABuilderFactory().make(options, cache, cha);
       CallGraph callGraph = builder.makeCallGraph(options, null);
-      long end_time = System.currentTimeMillis();
-      Log.done("Finished construction of call graph. Took " + (end_time - start_time)+ " milliseconds.");
+      Log.done("Finished construction of call graph. Took " + Math.ceil((double) (System.currentTimeMillis() - start_time) /1000)+ " seconds.");
 
       // Build SDG graph
       Log.info("Building System Dependency Graph.");
-      start_time = System.currentTimeMillis();
       SDG<? extends InstanceKey> sdg = new SDG<>(
               callGraph,
               builder.getPointerAnalysis(),
@@ -144,15 +152,12 @@ public class Code2Graph {
               Slicer.DataDependenceOptions.NO_HEAP_NO_EXCEPTIONS,
               Slicer.ControlDependenceOptions.NO_EXCEPTIONAL_EDGES);
 
-      Log.done("Built SDG. Took " + (System.currentTimeMillis() - start_time) + " seconds.");
-
       // Build IPCFG
       InterproceduralCFG ipcfg_full = new InterproceduralCFG(callGraph,
               n -> n.getMethod().getReference().getDeclaringClass().getClassLoader() == JavaSourceAnalysisScope.SOURCE
                       || n == callGraph.getFakeRootNode() || n == callGraph.getFakeWorldClinitNode());
 
       // Save SDG, IPCFG, and Call graph as JSON
-      Log.info("Saving the system dependency graph");
       Graph2JSON.convert(sdg, callGraph, ipcfg_full, outDir);
       Log.done("SDG saved at " + outDir);
 
