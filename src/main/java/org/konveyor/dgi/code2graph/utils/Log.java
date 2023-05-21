@@ -61,6 +61,11 @@ public class Log {
   }
 
   /** @param msg */
+  public static final void warn(String msg) {
+    toConsole(msg, ANSI_YELLOW, "WARN");
+  }
+
+  /** @param msg */
   public static final void error(String msg) {
     toConsole(msg, ANSI_RED, "ERROR");
   }
