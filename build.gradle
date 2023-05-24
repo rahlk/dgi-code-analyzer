@@ -13,7 +13,7 @@ if (project.hasProperty('mainClass')) {
     mainClassName = project.getProperty('mainClass')
 } else {
     // use a default
-    mainClassName = "org.konveyor.dgi.code2graph.Code2Graph"
+    mainClassName = "org.konveyor.dgi.CodeAnalyzer"
 }
 
 // Remove that nagging bin folder vscode seems to generate every single time
@@ -90,7 +90,7 @@ if (project.hasProperty("args")) {
 } else { 
     ext.cmdargs = ""
 }
-task code2graph(type: JavaExec) {
+task codeanalyzer(type: JavaExec) {
     group = "Execution"
     description = "WALA code to system dependency graph"
     classpath = sourceSets.main.runtimeClasspath

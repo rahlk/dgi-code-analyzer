@@ -41,7 +41,7 @@ Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community
 
 ```man
                                                       
-usage: ./code2graph [-h] [-i <arg>] [-e <arg>] [-o <arg>] [-q]
+usage: ./codeanalyzer [-h] [-i <arg>] [-e <arg>] [-o <arg>] [-q]
 
 Convert java binary (*.jar, *.ear, *.war) to its equivalent system
 dependency graph.
@@ -64,7 +64,7 @@ There are some sample binaries in `etc/demo`. An example usage is shown below:
 
 1. Process EAR files
    ```sh
-   ./code2graph -i etc/demo/daytrader7/binary/daytrader-ee7.ear -e etc/demo/daytrader7/dependencies/ -o etc/demo/daytrader7/output
+   ./codeanalyzer -i etc/demo/daytrader7/binary/daytrader-ee7.ear -e etc/demo/daytrader7/dependencies/ -o etc/demo/daytrader7/output
 
    2023-05-21T00:16:33.475721        [INFO]  Create analysis scope.
    2023-05-21T00:16:33.546258        [INFO]  Add exclusions to scope.
