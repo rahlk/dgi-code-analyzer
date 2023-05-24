@@ -1,4 +1,4 @@
-package org.konveyor.dgi.code2graph.utils.graph;
+package org.konveyor.dgi.utils.graph;
 
 import com.ibm.wala.ipa.slicer.Statement;
 import org.apache.commons.lang3.builder.HashCodeBuilder;

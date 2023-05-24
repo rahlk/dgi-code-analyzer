@@ -2,7 +2,6 @@ package org.konveyor.dgi.utils.graph;
 
 import org.jgrapht.nio.Attribute;
 import org.jgrapht.nio.DefaultAttribute;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 

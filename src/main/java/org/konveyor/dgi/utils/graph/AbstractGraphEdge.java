@@ -1,4 +1,4 @@
-package org.konveyor.dgi.code2graph.utils.graph;
+package org.konveyor.dgi.utils.graph;
 
 import java.io.Serializable;
 import java.util.Map;
