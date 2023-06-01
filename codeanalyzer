@@ -1,4 +1,4 @@
-#  Copyright IBM Corporation 2022
+#  Copyright IBM Corporation 2023
 #
 #  Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -9,21 +9,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-#!/usr/bin/env sh
+#!/bin/bash
 
-ARGS=""
-while [ "$1" != "" ]; do
-    case "$1" in
-    # Quote arguments with spaces.
-    *\ *)
-        ARGS="${ARGS} '$1'"
-        ;;
-    *)
-        ARGS="${ARGS} $1"
-        ;;
-    esac
-    shift
-done
+# If no arguments are provided, set defaults
+if [ $# -eq 0 ]; then
+    ARGS="--input=/binaries --extra-libs=/dependencies --output=/output"
+else
+    ARGS=""
+    while [ "$1" != "" ]; do
+        case "$1" in
+        # Quote arguments with spaces.
+        *\ *)
+            ARGS="${ARGS} '$1'"
+            ;;
+        *)
+            ARGS="${ARGS} $1"
+            ;;
+        esac
+        shift
+    done
+fi
 
 
 eval "./gradlew  --stacktrace --quiet clean codeanalyzer -Pargs=\"$ARGS\""

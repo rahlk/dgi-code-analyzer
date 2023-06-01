@@ -1,5 +1,5 @@
 /*
-Copyright IBM Corporation 2022
+Copyright IBM Corporation 2023
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
 import com.ibm.wala.classLoader.BinaryDirectoryTreeModule;
 import com.ibm.wala.classLoader.JarFileModule;
 import com.ibm.wala.ipa.callgraph.AnalysisScope;
+import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.properties.WalaProperties;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.config.FileOfClasses;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.jar.JarFile;
+import java.util.stream.StreamSupport;
 
 public class ScopeUtils {
 
@@ -72,10 +74,9 @@ public class ScopeUtils {
    * @param inputs Directories to consider for scope creation.
    * @return scope The created analysis scope
    * @throws IOException
-   * @throws URISyntaxException
    */
 
-  public static AnalysisScope createScope(String inputs, String extraLibs) throws IOException, URISyntaxException {
+  public static AnalysisScope createScope(String inputs, String extraLibs) throws IOException {
     Log.info("Create analysis scope.");
     AnalysisScope scope = new JavaSourceAnalysisScope();
     scope = addDefaultExclusions(scope);
@@ -94,7 +95,7 @@ public class ScopeUtils {
       Log.info("Loading user specified extra libs.");
       File[] listOfExtraLibs = new File(extraLibs).listFiles();
       for (File extraLibJar : listOfExtraLibs) {
-        Log.info("↪ Adding " + extraLibJar + " to scope.");
+        Log.info("-> Adding dependency " + extraLibJar.getName() + " to analysis scope.");
         scope.addToScope(ClassLoaderReference.Primordial, new JarFile(extraLibJar.getAbsolutePath()));
       }
     } else {
@@ -104,30 +105,15 @@ public class ScopeUtils {
     Path path = Paths.get(FileUtils.getTempDirectory().getAbsolutePath(), UUID.randomUUID().toString());
     String tmpDirString = Files.createDirectories(path).toFile().getAbsolutePath();
     Path workDir = Paths.get(tmpDirString);
-//    Log.debug("Unpacking *.{jar, war, ear} to " + workDir);
     FileUtils.cleanDirectory(workDir.toFile());
-    List<String> classRoots = new ArrayList<>();
-    List<String> jars = new ArrayList<>();
 
-    String[] binaryFiles = inputs.split(":");
-
-    for (String s : binaryFiles) {
-      if (new File(s).isDirectory()) {
-        classRoots.add(s);
-      } else if (s.endsWith(".ear") || s.endsWith(".war")) {
-        JarUtils.unpackArchives(s, workDir.resolve("unpacked"), classRoots, jars);
-      } else {
-        jars.add(s);
-      }
+    Log.info("Loading application jar(s).");
+    File[] listOfApplicationJars = new File(inputs).listFiles();
+    for (File applicationJar : listOfApplicationJars) {
+      Log.info("-> Adding application " + applicationJar.getName() + " to analysis scope.");
+      scope.addToScope(ClassLoaderReference.Application, new JarFile(applicationJar.getAbsolutePath()));
     }
 
-    for (String classRoot : classRoots) {
-      scope.addToScope(
-              ClassLoaderReference.Application, new BinaryDirectoryTreeModule(new File(classRoot)));
-    }
-    for (String jar : jars) {
-      scope.addToScope(ClassLoaderReference.Application, new JarFileModule(new JarFile(jar)));
-    }
     return scope;
   }
 

@@ -1,5 +1,5 @@
 /*
-Copyright IBM Corporation 2022
+Copyright IBM Corporation 2023
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,10 +46,14 @@ public class CodeAnalyzer {
     // Set Log Level
     Options options = new Options();
     options.addOption("i", "input", true,
-        "Path to the input jar(s). For multiple JARs, separate them with ':'. E.g., file1.jar:file2.jar, etc.");
+        "Path to the input jar(s). NOTE: This arg will the the path the to directory containing all the " +
+                "application jar, war, and/or ear files.");
     options.addOption("e", "extra-libs", true,
-            "Path to the extra libraries to consider when processing jar(s). This arg will the the path the to directory.");
-    options.addOption("o", "output", true, "Destination (directory) to save the output graphs.");
+            "Path to the extra libraries to consider when processing jar(s). " +
+                      "NOTE: This (optional) arg will the the path the to directory containing all the jar files of " +
+                      "all the dependencies used in the application.");
+    options.addOption("o", "output", true, "Destination (directory) to " +
+                                                                      "save the output graphs.");
     options.addOption("q", "quiet", false, "Don't print logs to console.");
     options.addOption("h", "help", false, "Print this help message.");
     CommandLineParser parser = new DefaultParser();
@@ -107,7 +111,8 @@ public class CodeAnalyzer {
     try {
       // Create class hierarchy
       IClassHierarchy cha = ClassHierarchyFactory.make(scope, new ECJClassLoaderFactory(scope.getExclusions()));
-      Log.done("Done class hierarchy: " + cha.getNumberOfClasses() + " classes");
+      Log.done("There were a total of " + cha.getNumberOfClasses() + " classes of which "
+              + AnalysisUtils.getNumberOfApplicationClasses(cha) + " are application classes.");
 
       // Initialize analysis options
       AnalysisOptions options = new AnalysisOptions();
