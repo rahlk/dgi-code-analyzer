@@ -1,5 +1,5 @@
 /*
-Copyright IBM Corporation 2022
+Copyright IBM Corporation 2023
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ import com.ibm.wala.ipa.callgraph.Entrypoint;
 import com.ibm.wala.ipa.callgraph.impl.DefaultEntrypoint;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
 import com.ibm.wala.types.ClassLoaderReference;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class AnalysisUtils {
 
@@ -42,6 +43,11 @@ public class AnalysisUtils {
     }
   }
 
+  public static long getNumberOfApplicationClasses(IClassHierarchy cha) {
+    return StreamSupport.stream(cha.spliterator(), false)
+            .filter(AnalysisUtils::isApplicationClass)
+            .count();
+  }
   /**
    * Use all public methods of all application classes as entrypoints.
    *
@@ -49,49 +55,42 @@ public class AnalysisUtils {
    * @return Iterable<Entrypoint>
    */
   public static Iterable<Entrypoint> getEntryPoints(IClassHierarchy cha) {
-    Collection<Entrypoint> entrypoints = new ArrayList<>();
-    int entrypointsCount = 0;
-    for (IClass c : cha) {
-      if (isApplicationClass(c)) {
-        try {
-          for (IMethod method : c.getDeclaredMethods()) {
-            if (method.isPublic()) {
-              entrypointsCount += 1;
-              entrypoints.add(new DefaultEntrypoint(method, cha));
-            }
-          }
-        } catch (NullPointerException nullPointerException) {
-          Log.error(c.getSourceFileName());
-          System.exit(1);
-        }
-      }
-    }
-    Log.info("Registered " + entrypointsCount + " entrypoints.");
+    List<Entrypoint> entrypoints = StreamSupport.stream(cha.spliterator(), true)
+            .filter(AnalysisUtils::isApplicationClass)
+            .flatMap(c -> {
+              try {
+                return c.getDeclaredMethods().stream();
+              } catch (NullPointerException nullPointerException) {
+                Log.error(c.getSourceFileName());
+                System.exit(1);
+                return Stream.empty();
+              }
+            })
+            .filter(method -> method.isPublic()
+                    || method.isPrivate()
+                    || method.isProtected()
+                    || method.isStatic())
+            .map(method -> new DefaultEntrypoint(method, cha))
+            .collect(Collectors.toList());
+
+    Log.info("Registered " + entrypoints.size() + " entrypoints.");
     return entrypoints;
   }
 
   public static void expandSymbolTable(IClassHierarchy cha) {
-    for (IClass c : cha) {
-      if (isApplicationClass(c)) {
-        // private constructor
-        String className = c.getName().getClassName().toString();
-        Map<String, Object> classAttributeMap = new HashMap<String, Object>();
-        String classIsPrivate = Boolean.toString(c.isPrivate());
-        classAttributeMap.put("isPrivate", classIsPrivate);
-        String classSourcePath = c.getSourceFileName();
-        classAttributeMap.put("source_file_name", classSourcePath);
-        Integer num_fields = c.getAllFields().size();
-        classAttributeMap.put("num_fields", num_fields);
-        Integer num_static_fields = c.getAllStaticFields().size();
-        classAttributeMap.put("num_static_fields", num_static_fields);
-        Integer num_static_methods = 0;
-        for (IMethod method : c.getDeclaredMethods()) {
-          num_static_methods += method.isStatic() ? 1 : 0;
-        }
-        classAttributeMap.put("num_static_methods", num_static_methods);
-        classAttributeMap.put("num_declared_methods", c.getDeclaredMethods().size());
-        classAttr.put(className, classAttributeMap);
-      }
-    }
+    StreamSupport.stream(cha.spliterator(), true)
+            .filter(AnalysisUtils::isApplicationClass)
+            .forEach(c -> {
+              String className = c.getName().getClassName().toString();
+              Map<String, Object> classAttributeMap = new HashMap<>();
+              classAttributeMap.put("isPrivate", Boolean.toString(c.isPrivate()));
+              classAttributeMap.put("source_file_name", c.getSourceFileName());
+              classAttributeMap.put("num_fields", c.getAllFields().size());
+              classAttributeMap.put("num_static_fields", c.getAllStaticFields().size());
+              long num_static_methods = c.getDeclaredMethods().stream().filter(IMethod::isStatic).count();
+              classAttributeMap.put("num_static_methods", num_static_methods);
+              classAttributeMap.put("num_declared_methods", c.getDeclaredMethods().size());
+              classAttr.put(className, classAttributeMap);
+    });
   }
 }
