@@ -1,5 +1,5 @@
 /*
-Copyright IBM Corporation 2022
+Copyright IBM Corporation 2023
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.konveyor.dgi.code2graph.utils;
+package org.konveyor.dgi.utils;
 
 import java.time.LocalDateTime;
 
@@ -58,6 +58,11 @@ public class Log {
   /** @param msg */
   public static final void debug(String msg) {
     toConsole(msg, ANSI_YELLOW, "DEBUG");
+  }
+
+  /** @param msg */
+  public static final void warn(String msg) {
+    toConsole(msg, ANSI_YELLOW, "WARN");
   }
 
   /** @param msg */
