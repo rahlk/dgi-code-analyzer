@@ -48,10 +48,14 @@ public class CodeAnalyzer {
     options.addOption("i", "input", true,
         "Path to the input jar(s). NOTE: This arg will the the path the to directory containing all the " +
                 "application jar, war, and/or ear files.");
-    options.addOption("e", "extra-libs", true,
-            "Path to the extra libraries to consider when processing jar(s). " +
+    options.addOption("d", "app-deps", true,
+            "Path to the application dependencies to consider when processing jar(s). " +
                       "NOTE: This (optional) arg will the the path the to directory containing all the jar files of " +
                       "all the dependencies used in the application.");
+    options.addOption("e", "extra-libs", true,
+            "Path to the extra (e.g., JEE) libraries to consider when processing jar(s). " +
+                      "NOTE: This (optional) arg will the the path the to directory containing all the jar files of " +
+                      "all the JavaEE/other default libraries used in the application.");
     options.addOption("o", "output", true, "Destination (directory) to " +
                                                                       "save the output graphs.");
     options.addOption("q", "quiet", false, "Don't print logs to console.");
@@ -103,8 +107,9 @@ public class CodeAnalyzer {
 
     String input = cmd.getOptionValue("input");
     String outDir = cmd.getOptionValue("output");
+    String appDeps = cmd.getOptionValue("app-deps");
     String extraLibs = cmd.getOptionValue("extra-libs");
-    AnalysisScope scope = ScopeUtils.createScope(input, extraLibs);
+    AnalysisScope scope = ScopeUtils.createScope(input, extraLibs, appDeps);
 
     // Make class hierarchy
     Log.info("Make class hierarchy.");
