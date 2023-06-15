@@ -35,7 +35,8 @@ Refer to Konveyor's Code of Conduct [here](https://github.com/konveyor/community
 
 ## Prequisits 
 
-- Java 11
+- Java 11 (For usage as a standalone tool)
+- Docker (For usage as a container)
 
 ## Usage
 
@@ -57,36 +58,76 @@ dependency graph.
  -q,--quiet              Don't print logs to console.
 ```
 
-### Examples
+### 1. As a standalone tool
 
-There are some sample binaries in `etc/demo`. An example usage is shown below:
+There are some sample binaries in github.com/rahlk/dgi-sample-applications. As an example usage, we'll use daytrader8 as shown below:
 
-1. Process EAR files
    ```sh
-   ./codeanalyzer -i etc/demo/daytrader7/binary/daytrader-ee7.ear -e etc/demo/daytrader7/dependencies/ -o etc/demo/daytrader7/output
-
-   2023-05-21T00:16:33.475721        [INFO]  Create analysis scope.
-   2023-05-21T00:16:33.546258        [INFO]  Add exclusions to scope.
-   2023-05-21T00:16:33.547106        [INFO]  Loading Java SE standard libs.
-   2023-05-21T00:16:33.582578        [INFO]  Loading user specified extra libs.
-   2023-05-21T00:16:33.589225        [INFO]  ↪ Adding etc/demo/daytrader7/dependencies/activation-1.1.jar to scope.
-   2023-05-21T00:16:33.589612        [INFO]  ↪ Adding etc/demo/daytrader7/dependencies/javax.annotation-api-1.3.2.jar to scope.
-   2023-05-21T00:16:33.589863        [INFO]  ↪ Adding etc/demo/daytrader7/dependencies/javax.mail-1.5.0.jar to scope.
-   2023-05-21T00:16:33.590170        [INFO]  ↪ Adding etc/demo/daytrader7/dependencies/javaee-api-7.0.jar to scope.
-   2023-05-21T00:16:33.805806        [INFO]  Make class hierarchy.
-   2023-05-21T00:16:35.229173        [DONE]  Done class hierarchy: 15921 classes
-   2023-05-21T00:16:35.257127        [INFO]  Registered 1000 entrypoints.
-   2023-05-21T00:16:35.266491        [INFO]  Building call graph.
-   2023-05-21T00:16:39.708361        [DONE]  Finished construction of call graph. Took 5.0 seconds.
-   2023-05-21T00:16:39.708481        [INFO]  Building System Dependency Graph.
-   2023-05-21T00:16:39.722452        [INFO]  Pruning SDG to keep only Application classes.
-   2023-05-21T00:16:41.328015        [DONE]  SDG built and pruned. It has 31321 nodes.
-   2023-05-21T00:16:42.334647        [DONE]  SDG saved at etc/demo/daytrader7/output
+   ./codeanalyzer  -i /path/to/dgi-sample-applications/daytrader8/binaries -e /path/to/dgi-sample-applications/daytrader8/libs -o /path/to/dgi-sample-applications/daytrader8/output
+   ```
+   ```
+   2023-06-15T02:08:35.375035      [INFO]  Create analysis scope.
+   2023-06-15T02:08:35.478729      [INFO]  Add exclusions to scope.
+   2023-06-15T02:08:35.480074      [INFO]  Loading Java SE standard libs.
+   2023-06-15T02:08:35.553166      [INFO]  Loading user specified extra libs.
+   2023-06-15T02:08:35.563673      [INFO]  -> Adding dependency activation-1.1.jar to analysis scope.
+   2023-06-15T02:08:35.574235      [INFO]  -> Adding dependency derby-10.14.2.0.jar to analysis scope.
+   2023-06-15T02:08:35.586332      [INFO]  -> Adding dependency javaee-api-8.0.jar to analysis scope.
+   2023-06-15T02:08:35.597902      [INFO]  -> Adding dependency javax.mail-1.6.0.jar to analysis scope.
+   2023-06-15T02:08:35.607116      [INFO]  -> Adding dependency jaxb-api-2.3.0.jar to analysis scope.
+   2023-06-15T02:08:35.613697      [INFO]  -> Adding dependency standard-1.1.1.jar to analysis scope.
+   2023-06-15T02:08:35.636437      [INFO]  Loading application jar(s).
+   2023-06-15T02:08:35.639916      [INFO]  -> Adding application daytrader8.jar to analysis scope.
+   2023-06-15T02:08:35.647837      [INFO]  Make class hierarchy.
+   2023-06-15T02:08:37.823779      [DONE]  There were a total of 16016 classes of which 155 are application classes.
+   2023-06-15T02:08:37.904373      [INFO]  Registered 1244 entrypoints.
+   2023-06-15T02:08:37.923757      [INFO]  Building call graph.
+   2023-06-15T02:08:47.558413      [DONE]  Finished construction of call graph. Took 10.0 seconds.
+   2023-06-15T02:08:47.559886      [INFO]  Building System Dependency Graph.
+   2023-06-15T02:08:47.574035      [INFO]  Pruning SDG to keep only Application classes.
+   2023-06-15T02:08:50.358856      [DONE]  SDG built and pruned. It has 32120 nodes.
+   2023-06-15T02:08:52.383651      [DONE]  SDG saved at /output
    ```
 
-This will produce a JSON file called `sdg.json` at `etc/demo/daytrader7/output`.
+This will produce a JSON file called `sdg.json` at `/path/to/dgi-sample-applications/daytrader8/output`.
 
-### LICENSE
+### 2. For usage as a docker container
+
+A containerized version of code-analyzer is available at quay.io/rkrsn/code-analyzer. As an example usage, we'll 
+again use daytrader8 as shown below:
+
+   ```sh
+   docker run --rm \
+      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/binaries:/binaries \
+      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/libs/:/dependencies \
+      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/output/:/output \
+      quay.io/rkrsn/code-analyzer:latest 
+   ```
+   ```
+   2023-06-15T02:08:35.375035      [INFO]  Create analysis scope.
+   2023-06-15T02:08:35.478729      [INFO]  Add exclusions to scope.
+   2023-06-15T02:08:35.480074      [INFO]  Loading Java SE standard libs.
+   2023-06-15T02:08:35.553166      [INFO]  Loading user specified extra libs.
+   2023-06-15T02:08:35.563673      [INFO]  -> Adding dependency activation-1.1.jar to analysis scope.
+   2023-06-15T02:08:35.574235      [INFO]  -> Adding dependency derby-10.14.2.0.jar to analysis scope.
+   2023-06-15T02:08:35.586332      [INFO]  -> Adding dependency javaee-api-8.0.jar to analysis scope.
+   2023-06-15T02:08:35.597902      [INFO]  -> Adding dependency javax.mail-1.6.0.jar to analysis scope.
+   2023-06-15T02:08:35.607116      [INFO]  -> Adding dependency jaxb-api-2.3.0.jar to analysis scope.
+   2023-06-15T02:08:35.613697      [INFO]  -> Adding dependency standard-1.1.1.jar to analysis scope.
+   2023-06-15T02:08:35.636437      [INFO]  Loading application jar(s).
+   2023-06-15T02:08:35.639916      [INFO]  -> Adding application daytrader8.jar to analysis scope.
+   2023-06-15T02:08:35.647837      [INFO]  Make class hierarchy.
+   2023-06-15T02:08:37.823779      [DONE]  There were a total of 16016 classes of which 155 are application classes.
+   2023-06-15T02:08:37.904373      [INFO]  Registered 1244 entrypoints.
+   2023-06-15T02:08:37.923757      [INFO]  Building call graph.
+   2023-06-15T02:08:47.558413      [DONE]  Finished construction of call graph. Took 10.0 seconds.
+   2023-06-15T02:08:47.559886      [INFO]  Building System Dependency Graph.
+   2023-06-15T02:08:47.574035      [INFO]  Pruning SDG to keep only Application classes.
+   2023-06-15T02:08:50.358856      [DONE]  SDG built and pruned. It has 32120 nodes.
+   2023-06-15T02:08:52.383651      [DONE]  SDG saved at /output
+   ```
+
+## LICENSE
 
 ```
 Copyright IBM Corporation 2023
