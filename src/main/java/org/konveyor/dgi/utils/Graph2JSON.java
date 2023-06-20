@@ -23,7 +23,6 @@ import com.ibm.wala.ipa.slicer.Statement;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.graph.Graph;
-import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.util.graph.GraphSlicer;
 import com.ibm.wala.util.graph.traverse.DFS;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
