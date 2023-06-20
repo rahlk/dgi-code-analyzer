@@ -79,8 +79,7 @@ public class Graph2JSON {
                 .forEach(p -> sdg.getSuccNodes(p).forEachRemaining(s -> {
                     if (dfsFinish.containsKey(s)
                             && !((dfsStart.get(p) >= dfsStart.get(s))
-                            && (dfsFinish.get(p) <= dfsFinish.get(s)))
-                            && !p.getNode().getMethod().equals(s.getNode().getMethod())) {
+                            && (dfsFinish.get(p) <= dfsFinish.get(s)))) {
 
                         // Build source and destination nodes
                         MethodNode source = new MethodNode(p.getNode().getMethod());
