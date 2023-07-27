@@ -110,10 +110,3 @@ task codeanalyzer(type: JavaExec) {
     mainClass = mainClassName
     args cmdargs.split()
 }
-task daytrader(type: JavaExec) {
-    group = "Execution"
-    description = "WALA code to system dependency graph"
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = mainClassName
-    args "-i etc/demo/daytrader-ee7-ejb.jar -o .".split()
-}
