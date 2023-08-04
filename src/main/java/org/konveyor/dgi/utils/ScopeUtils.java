@@ -40,33 +40,33 @@ import java.util.stream.StreamSupport;
 public class ScopeUtils {
 
   public static String[] stdLibs;
-  // I am not including any exclusions for now.
-  private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
-          + "javax\\/awt\\/.*\n"
-          + "javax\\/swing\\/.*\n"
-          + "sun\\/.*\n"
-          + /* "com\\/.*\n" + */ "jdk\\/.*\n"
-          + "oracle\\/.*\n"
-          + "apple\\/.*\n"
-          + "netscape\\/.*\n"
-          + "javafx\\/.*\n"
-          + "org\\/w3c\\/.*\n"
-          + "org\\/xml\\/.*\n"
-          + "org\\/jcp\\/.*\n"
-          + "org\\/ietf\\/.*\n"
-          + "org\\/omg\\/.*\n"
-          + "java\\/security\\/.*\n"
-          + "java\\/beans\\/.*\n"
-          + "java\\/time\\/.*\n"
-          + "java\\/text\\/.*\n"
-          + "java\\/net\\/.*\n"
-          + "java\\/nio\\/.*\n" /* + "java\\/io\\/.*\n" */
-          + "java\\/math\\/.*\n"
-          + "java\\/applet\\/.*\n"
-          + "java\\/rmi\\/.*\n"
-          + "org\\/apache\\/.*\n"
-          + "";
+  private static final String EXCLUSIONS = "";  // I am not including any exclusions for now.
 
+//  private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
+//          + "javax\\/awt\\/.*\n"
+//          + "javax\\/swing\\/.*\n"
+//          + "sun\\/.*\n"
+//          +  "jdk\\/.*\n"
+//          + "oracle\\/.*\n"
+//          + "apple\\/.*\n"
+//          + "netscape\\/.*\n"
+//          + "javafx\\/.*\n"
+//          + "org\\/w3c\\/.*\n"
+//          + "org\\/xml\\/.*\n"
+//          + "org\\/jcp\\/.*\n"
+//          + "org\\/ietf\\/.*\n"
+//          + "org\\/omg\\/.*\n"
+//          + "java\\/security\\/.*\n"
+//          + "java\\/beans\\/.*\n"
+//          + "java\\/time\\/.*\n"
+//          + "java\\/text\\/.*\n"
+//          + "java\\/net\\/.*\n"
+//          + "java\\/nio\\/.*\n"
+//          + "java\\/io\\/.*\n"
+//          + "java\\/math\\/.*\n"
+//          + "java\\/applet\\/.*\n"
+//          + "java\\/rmi\\/.*\n"
+//          + "org\\/apache\\/.*\n";
 
   /**
    * Create an analysis scope base on the input
