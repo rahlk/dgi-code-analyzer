@@ -16,7 +16,6 @@ package org.konveyor.dgi;
 import com.ibm.wala.cast.ir.ssa.AstIRFactory;
 import com.ibm.wala.cast.java.client.impl.ZeroOneCFABuilderFactory;
 import com.ibm.wala.cast.java.ipa.callgraph.JavaSourceAnalysisScope;
-import com.ibm.wala.cast.java.ipa.modref.AstJavaModRef;
 import com.ibm.wala.cast.java.translator.jdt.ecj.ECJClassLoaderFactory;
 import com.ibm.wala.ipa.callgraph.*;
 import com.ibm.wala.ipa.callgraph.AnalysisOptions.ReflectionOptions;
@@ -29,6 +28,8 @@ import com.ibm.wala.ipa.callgraph.propagation.PropagationCallGraphBuilder;
 import com.ibm.wala.ipa.cha.ClassHierarchyException;
 import com.ibm.wala.ipa.cha.ClassHierarchyFactory;
 import com.ibm.wala.ipa.cha.IClassHierarchy;
+import com.ibm.wala.ipa.modref.ModRef;
+
 import org.apache.commons.cli.*;
 import org.konveyor.dgi.utils.*;
 
@@ -139,7 +140,7 @@ public class CodeAnalyzer {
       SDG<? extends InstanceKey> sdg = new SDG<>(
               callGraph,
               builder.getPointerAnalysis(),
-              new AstJavaModRef<>(),
+              new ModRef<>(),
               Slicer.DataDependenceOptions.NO_HEAP_NO_EXCEPTIONS,
               Slicer.ControlDependenceOptions.NO_EXCEPTIONAL_EDGES);
 
@@ -155,6 +156,10 @@ public class CodeAnalyzer {
     } catch (ClassHierarchyException | IllegalArgumentException | NullPointerException che) {
       che.printStackTrace();
       System.exit(-1);
+    }
+    catch (Exception e) {
+    	e.printStackTrace();
+    	System.exit(-1);
     }
   }
 }
