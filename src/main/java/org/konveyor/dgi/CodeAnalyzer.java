@@ -116,7 +116,7 @@ public class CodeAnalyzer {
     Log.info("Make class hierarchy.");
     try {
       // Create class hierarchy
-      IClassHierarchy cha = ClassHierarchyFactory.make(scope, new ECJClassLoaderFactory(scope.getExclusions()));
+      IClassHierarchy cha = ClassHierarchyFactory.makeWithPhantom(scope, new ECJClassLoaderFactory(scope.getExclusions()));
       Log.done("There were a total of " + cha.getNumberOfClasses() + " classes of which "
               + AnalysisUtils.getNumberOfApplicationClasses(cha) + " are application classes.");
 
