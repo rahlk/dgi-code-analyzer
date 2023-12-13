@@ -58,16 +58,22 @@ public class Graph2JSON {
         int dfsNumber = 0;
         Map<Statement,Integer> dfsFinish = HashMapFactory.make();
         Iterator<Statement> search = DFS.iterateFinishTime(sdg, entryPoints.get());
-        while (search.hasNext()) {
-            dfsFinish.put(search.next(), dfsNumber++);
-        }
-
+        
         // This is a reverse DFS search (or entry time first search)
         int reverseDfsNumber = 0;
         Map<Statement,Integer> dfsStart = HashMapFactory.make();
         Iterator<Statement> reverseSearch = DFS.iterateDiscoverTime(sdg, entryPoints.get());
-        while (reverseSearch.hasNext()) {
-            dfsStart.put(reverseSearch.next(), reverseDfsNumber++);
+       
+        while (search.hasNext() && reverseSearch.hasNext()) {
+            Statement s = search.next();
+        	if (s != null) {
+        		dfsFinish.put(s, dfsNumber++);	
+        	}
+
+        	Statement r = reverseSearch.next();
+        	if (r != null) {
+        		dfsFinish.put(r, reverseDfsNumber++);	
+        	}
         }
 
         // Populate graph
@@ -76,6 +82,7 @@ public class Graph2JSON {
                 .sorted(Comparator.comparingInt(dfsFinish::get))
                 .forEach(p -> sdg.getSuccNodes(p).forEachRemaining(s -> {
                     if (dfsFinish.containsKey(s)
+                            && dfsStart.get(p) != null && dfsStart.get(s) != null
                             && !((dfsStart.get(p) >= dfsStart.get(s))
                             && (dfsFinish.get(p) <= dfsFinish.get(s)))
                             && !p.getNode().getMethod().equals(s.getNode().getMethod())) {
