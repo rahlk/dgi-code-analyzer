@@ -23,7 +23,6 @@ import com.ibm.wala.ipa.slicer.Statement;
 import com.ibm.wala.types.ClassLoaderReference;
 import com.ibm.wala.util.collections.HashMapFactory;
 import com.ibm.wala.util.graph.Graph;
-import com.ibm.wala.classLoader.IMethod;
 import com.ibm.wala.util.graph.GraphSlicer;
 import com.ibm.wala.util.graph.traverse.DFS;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -34,7 +33,6 @@ import java.io.File;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -60,6 +58,7 @@ public class Graph2JSON {
         int dfsNumber = 0;
         Map<Statement,Integer> dfsFinish = HashMapFactory.make();
         Iterator<Statement> search = DFS.iterateFinishTime(sdg, entryPoints.get());
+       
         while (search.hasNext()) {
             dfsFinish.put(search.next(), dfsNumber++);
         }
@@ -68,6 +67,7 @@ public class Graph2JSON {
         int reverseDfsNumber = 0;
         Map<Statement,Integer> dfsStart = HashMapFactory.make();
         Iterator<Statement> reverseSearch = DFS.iterateDiscoverTime(sdg, entryPoints.get());
+        
         while (reverseSearch.hasNext()) {
             dfsStart.put(reverseSearch.next(), reverseDfsNumber++);
         }
@@ -78,6 +78,7 @@ public class Graph2JSON {
                 .sorted(Comparator.comparingInt(dfsFinish::get))
                 .forEach(p -> sdg.getSuccNodes(p).forEachRemaining(s -> {
                     if (dfsFinish.containsKey(s)
+                            && dfsStart.get(p) != null && dfsStart.get(s) != null
                             && !((dfsStart.get(p) >= dfsStart.get(s))
                             && (dfsFinish.get(p) <= dfsFinish.get(s)))
                             && !p.getNode().getMethod().equals(s.getNode().getMethod())) {

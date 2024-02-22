@@ -20,13 +20,23 @@ version = '1.0-dev'
 
 repositories {
     mavenCentral()
+    mavenLocal()
+    flatDir {
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.util/build/libs'
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.core/build/libs'
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast/build/libs'
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.shrike/build/libs'
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast.java/build/libs'
+        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast.java.ecj/build/libs'
+    }
 }
+
 
 if (project.hasProperty('mainClass')) {
     mainClassName = project.getProperty('mainClass')
 } else {
     // use a default
-    mainClassName = "org.konveyor.dgi.CodeAnalyzer"
+    mainClassName =("org.konveyor.dgi.CodeAnalyzer")
 }
 
 // Remove that nagging bin folder vscode seems to generate every single time
@@ -46,32 +56,32 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
     def walaVersion = '1.5.9'
 
-    // implementation "com.ibm.wala:com.ibm.wala.shrike:${walaVersion}"
-    implementation "com.ibm.wala:com.ibm.wala.util:${walaVersion}"
-    implementation "com.ibm.wala:com.ibm.wala.core:${walaVersion}"
-    implementation "com.ibm.wala:com.ibm.wala.cast:${walaVersion}"
-    implementation "com.ibm.wala:com.ibm.wala.cast.java:${walaVersion}"
-    implementation "com.ibm.wala:com.ibm.wala.cast.java.ecj:${walaVersion}"
+    implementation name: "com.ibm.wala.util-${walaVersion}"
+    implementation name: "com.ibm.wala.core-${walaVersion}"
+    implementation name: "com.ibm.wala.cast-${walaVersion}"
+    implementation name: "com.ibm.wala.shrike-${walaVersion}"
+    implementation name: "com.ibm.wala.cast.java-${walaVersion}"
+    implementation name: "com.ibm.wala.cast.java.ecj-${walaVersion}"
 
-    implementation "org.eclipse.jdt:org.eclipse.jdt.core:3.21.0"
-    implementation "org.eclipse.platform:org.eclipse.core.commands:3.9.700"
-    implementation "org.eclipse.platform:org.eclipse.core.contenttype:3.7.1000"
-    implementation "org.eclipse.platform:org.eclipse.core.expressions:3.7.100"
-    implementation "org.eclipse.platform:org.eclipse.core.filesystem:1.9.0"
-    implementation "org.eclipse.platform:org.eclipse.core.jobs:3.11.0"
-    implementation "org.eclipse.platform:org.eclipse.core.resources:3.14.0"
-    implementation "org.eclipse.platform:org.eclipse.core.runtime:3.17.100"
-    implementation "org.eclipse.platform:org.eclipse.equinox.app:1.5.100"
-    implementation "org.eclipse.platform:org.eclipse.equinox.common:3.14.100"
-    implementation "org.eclipse.platform:org.eclipse.equinox.preferences:3.8.200"
-    implementation "org.eclipse.platform:org.eclipse.equinox.registry:3.10.200"
-    implementation "org.eclipse.platform:org.eclipse.osgi:3.16.300"
-    implementation "org.eclipse.platform:org.eclipse.text:3.11.0"
+    implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.21.0")
+    implementation("org.eclipse.platform:org.eclipse.core.commands:3.9.700")
+    implementation("org.eclipse.platform:org.eclipse.core.contenttype:3.7.1000")
+    implementation("org.eclipse.platform:org.eclipse.core.expressions:3.7.100")
+    implementation("org.eclipse.platform:org.eclipse.core.filesystem:1.9.0")
+    implementation("org.eclipse.platform:org.eclipse.core.jobs:3.11.0")
+    implementation("org.eclipse.platform:org.eclipse.core.resources:3.14.0")
+    implementation("org.eclipse.platform:org.eclipse.core.runtime:3.17.100")
+    implementation("org.eclipse.platform:org.eclipse.equinox.app:1.5.100")
+    implementation("org.eclipse.platform:org.eclipse.equinox.common:3.14.100")
+    implementation("org.eclipse.platform:org.eclipse.equinox.preferences:3.8.200")
+    implementation("org.eclipse.platform:org.eclipse.equinox.registry:3.10.200")
+    implementation("org.eclipse.platform:org.eclipse.osgi:3.16.300")
+    implementation("org.eclipse.platform:org.eclipse.text:3.11.0")
 
-    implementation 'org.json:json:20220924'
-    implementation 'org.jgrapht:jgrapht-core:1.5.1'
-    implementation 'org.jgrapht:jgrapht-io:1.5.1'
-    implementation 'org.jgrapht:jgrapht-ext:1.5.1'
+    implementation('org.json:json:20220924')
+    implementation('org.jgrapht:jgrapht-core:1.5.1')
+    implementation('org.jgrapht:jgrapht-io:1.5.1')
+    implementation('org.jgrapht:jgrapht-ext:1.5.1')
 
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
@@ -109,11 +119,4 @@ task codeanalyzer(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = mainClassName
     args cmdargs.split()
-}
-task daytrader(type: JavaExec) {
-    group = "Execution"
-    description = "WALA code to system dependency graph"
-    classpath = sourceSets.main.runtimeClasspath
-    mainClass = mainClassName
-    args "-i etc/demo/daytrader-ee7-ejb.jar -o .".split()
 }

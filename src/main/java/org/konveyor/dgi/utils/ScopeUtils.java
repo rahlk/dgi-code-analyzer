@@ -40,33 +40,33 @@ import java.util.stream.StreamSupport;
 public class ScopeUtils {
 
   public static String[] stdLibs;
-  // I am not including any exclusions for now.
-  private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
-          + "javax\\/awt\\/.*\n"
-          + "javax\\/swing\\/.*\n"
-          + "sun\\/.*\n"
-          + /* "com\\/.*\n" + */ "jdk\\/.*\n"
-          + "oracle\\/.*\n"
-          + "apple\\/.*\n"
-          + "netscape\\/.*\n"
-          + "javafx\\/.*\n"
-          + "org\\/w3c\\/.*\n"
-          + "org\\/xml\\/.*\n"
-          + "org\\/jcp\\/.*\n"
-          + "org\\/ietf\\/.*\n"
-          + "org\\/omg\\/.*\n"
-          + "java\\/security\\/.*\n"
-          + "java\\/beans\\/.*\n"
-          + "java\\/time\\/.*\n"
-          + "java\\/text\\/.*\n"
-          + "java\\/net\\/.*\n"
-          + "java\\/nio\\/.*\n" /* + "java\\/io\\/.*\n" */
-          + "java\\/math\\/.*\n"
-          + "java\\/applet\\/.*\n"
-          + "java\\/rmi\\/.*\n"
-          + "org\\/apache\\/.*\n"
-          + "";
+  private static final String EXCLUSIONS = "";  // I am not including any exclusions for now.
 
+//  private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
+//          + "javax\\/awt\\/.*\n"
+//          + "javax\\/swing\\/.*\n"
+//          + "sun\\/.*\n"
+//          +  "jdk\\/.*\n"
+//          + "oracle\\/.*\n"
+//          + "apple\\/.*\n"
+//          + "netscape\\/.*\n"
+//          + "javafx\\/.*\n"
+//          + "org\\/w3c\\/.*\n"
+//          + "org\\/xml\\/.*\n"
+//          + "org\\/jcp\\/.*\n"
+//          + "org\\/ietf\\/.*\n"
+//          + "org\\/omg\\/.*\n"
+//          + "java\\/security\\/.*\n"
+//          + "java\\/beans\\/.*\n"
+//          + "java\\/time\\/.*\n"
+//          + "java\\/text\\/.*\n"
+//          + "java\\/net\\/.*\n"
+//          + "java\\/nio\\/.*\n"
+//          + "java\\/io\\/.*\n"
+//          + "java\\/math\\/.*\n"
+//          + "java\\/applet\\/.*\n"
+//          + "java\\/rmi\\/.*\n"
+//          + "org\\/apache\\/.*\n";
 
   /**
    * Create an analysis scope base on the input
@@ -76,7 +76,7 @@ public class ScopeUtils {
    * @throws IOException
    */
 
-  public static AnalysisScope createScope(String inputs, String extraLibs) throws IOException {
+  public static AnalysisScope createScope(String inputs, String extraLibs, String applicationDeps) throws IOException {
     Log.info("Create analysis scope.");
     AnalysisScope scope = new JavaSourceAnalysisScope();
     scope = addDefaultExclusions(scope);
@@ -88,15 +88,24 @@ public class ScopeUtils {
     }
     setStdLibs(stdlibs);
 
+    if (!(extraLibs == null)) {
+      Log.info("Loading popular Java EE standard libs.");
+      File[] listOfJavaEELibs = new File(extraLibs).listFiles();
+      for (File extraLibJar : listOfJavaEELibs) {
+        Log.info("-> Adding dependency " + extraLibJar.getName() + " to analysis scope.");
+        scope.addToScope(ClassLoaderReference.Extension, new JarFile(extraLibJar.getAbsolutePath()));
+      }
+    }
+
     // -------------------------------------
     // Add extra user provided JARS to scope
     // -------------------------------------
-    if (!(extraLibs == null)) {
+    if (!(applicationDeps == null)) {
       Log.info("Loading user specified extra libs.");
-      File[] listOfExtraLibs = new File(extraLibs).listFiles();
+      File[] listOfExtraLibs = new File(applicationDeps).listFiles();
       for (File extraLibJar : listOfExtraLibs) {
         Log.info("-> Adding dependency " + extraLibJar.getName() + " to analysis scope.");
-        scope.addToScope(ClassLoaderReference.Primordial, new JarFile(extraLibJar.getAbsolutePath()));
+        scope.addToScope(ClassLoaderReference.Extension, new JarFile(extraLibJar.getAbsolutePath()));
       }
     } else {
       Log.warn("No extra libraries to process.");
