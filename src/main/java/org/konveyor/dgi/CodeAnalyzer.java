@@ -39,7 +39,7 @@ import picocli.CommandLine.Option;
 
 import java.io.IOException;
 
-@Command(name = "codeanalyzer", mixinStandardHelpOptions = true, version = "codeanalyzer 1.0", description = "Convert java binary (*.jar, *.ear, *.war) to a neo4j graph.")
+@Command(name = "codeanalyzer", mixinStandardHelpOptions = true, version = "1.0", description = "Convert java binary (*.jar, *.ear, *.war) to a neo4j graph.")
 public class CodeAnalyzer implements Runnable {
 
   @Option(names = { "-i", "--input" }, required = true, description = "Path to the input jar(s).")
@@ -78,7 +78,8 @@ public class CodeAnalyzer implements Runnable {
     }
   }
 
-  private static void analyze(String input, String outDir, String appDeps, String extraLibs) throws IOException, ClassHierarchyException, CallGraphBuilderCancelException {
+  private static void analyze(String input, String outDir, String appDeps, String extraLibs)
+      throws IOException, ClassHierarchyException, CallGraphBuilderCancelException {
 
     AnalysisScope scope = ScopeUtils.createScope(input, extraLibs, appDeps);
 

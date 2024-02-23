@@ -130,10 +130,6 @@ graalvmNative {
             buildArgs.add("-H:ResourceConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/resource-config.json")
             buildArgs.add("-H:JNIConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/jni-config.json")
             buildArgs.add("-H:DynamicProxyConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/proxy-config.json")
-
-            // Dynamically add modules
-            def jmodModules = getJmodModuleNames()
-            buildArgs.add("--add-modules=$jmodModules")
         }
         test {
             buildArgs.add("-O0")
