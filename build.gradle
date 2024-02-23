@@ -117,27 +117,6 @@ task codeanalyzer(type: JavaExec) {
     args cmdargs.split()
 }
 
-def getJmodModuleNames() {
-    def jmodsDirPath = "${System.env.JAVA_HOME}/jmods"
-    def jmodsDir = new File(jmodsDirPath)
-
-    if (!jmodsDir.exists() || !jmodsDir.isDirectory()) {
-        throw new GradleException("JMODs directory not found at $jmodsDirPath")
-    }
-
-    def moduleNames = jmodsDir.listFiles(new FilenameFilter() {
-        @Override
-        boolean accept(File dir, String name) {
-            return name.endsWith('.jmod')
-        }
-    }).collect { file ->
-        file.name[0..-6] // Extract the module name from the file name by removing the .jmod extension
-    }.join(',')
-
-    return moduleNames
-}
-
-
 graalvmNative {
     binaries {
         main {
