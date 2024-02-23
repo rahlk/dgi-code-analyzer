@@ -40,33 +40,8 @@ import java.util.stream.StreamSupport;
 public class ScopeUtils {
 
   public static String[] stdLibs;
-  private static final String EXCLUSIONS = "";  // I am not including any exclusions for now.
 
-//  private static final String EXCLUSIONS = "java\\/awt\\/.*\n"
-//          + "javax\\/awt\\/.*\n"
-//          + "javax\\/swing\\/.*\n"
-//          + "sun\\/.*\n"
-//          +  "jdk\\/.*\n"
-//          + "oracle\\/.*\n"
-//          + "apple\\/.*\n"
-//          + "netscape\\/.*\n"
-//          + "javafx\\/.*\n"
-//          + "org\\/w3c\\/.*\n"
-//          + "org\\/xml\\/.*\n"
-//          + "org\\/jcp\\/.*\n"
-//          + "org\\/ietf\\/.*\n"
-//          + "org\\/omg\\/.*\n"
-//          + "java\\/security\\/.*\n"
-//          + "java\\/beans\\/.*\n"
-//          + "java\\/time\\/.*\n"
-//          + "java\\/text\\/.*\n"
-//          + "java\\/net\\/.*\n"
-//          + "java\\/nio\\/.*\n"
-//          + "java\\/io\\/.*\n"
-//          + "java\\/math\\/.*\n"
-//          + "java\\/applet\\/.*\n"
-//          + "java\\/rmi\\/.*\n"
-//          + "org\\/apache\\/.*\n";
+  private static final String EXCLUSIONS = "java\\/awt\\/.*\n" + "sun\\/.*\n" + "jdk\\/.*\n" + "apple\\/.*\n" + "oracle\\/.*\n" + "javafx\\/.*\n" + "netscape\\/.*\n" + "org\\/omg\\/.*\n" + "org\\/w3c\\/.*\n" + "org\\/xml\\/.*\n" + "org\\/jcp\\/.*\n" + "org\\/ietf\\/.*\n" + "javax\\/awt\\/.*\n" + "javax\\/swing\\/.*\n" + "java\\/net\\/.*\n" + "java\\/nio\\/.*\n" + "java\\/time\\/.*\n" + "java\\/text\\/.*\n" + "java\\/beans\\/.*\n" + "java\\/io\\/.*\n" + "java\\/rmi\\/.*\n" + "java\\/math\\/.*\n" + "org\\/apache\\/.*\n" + "java\\/applet\\/.*\n" + "java\\/security\\/.*\n";
 
   /**
    * Create an analysis scope base on the input
@@ -82,7 +57,11 @@ public class ScopeUtils {
     scope = addDefaultExclusions(scope);
 
     Log.info("Loading Java SE standard libs.");
-    String[] stdlibs = WalaProperties.getJ2SEJarFiles();
+    String[] stdlibs = Files.walk(Paths.get(System.getenv("JAVA_HOME"), "jmods"))
+            .filter(path -> path.toString().endsWith(".jmod"))
+            .map(path -> path.toAbsolutePath().toString())
+            .toArray(String[]::new);
+
     for (String stdlib : stdlibs) {
       scope.addToScope(ClassLoaderReference.Primordial, new JarFile(stdlib));
     }
