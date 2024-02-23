@@ -1,66 +1,60 @@
+#
+
 ![logo](./docs/assets/logo.png)
 
 Native WALA implementation of source code analysis tool for Enterprise Java Applications.
 
-## Prerequisites
+## 1. Prerequisites
 
 Before you begin, ensure you have met the following requirements:
 
 * You have a Linux/MacOS/WSL machine.
 * You have installed the latest version of [SDKMan!](sdkman.io/)
 
-## Installing `codeanalyzer`
+## 2. Installing `codeanalyzer`
 
 To install `codeanalyzer`, follow these steps:
 
-#### Install SDKMAN! and GraalVM
+### 2.1. Install SDKMan! and GraalVM
 
-1. Install SDKMAN!
+1. Install SDKMan!
    Open your terminal and enter the following command:
 
-```bash
-curl -s "https://get.sdkman.io" | bash
-```
+   ```bash
+   curl -s "https://get.sdkman.io" | bash
+   ```
 
-Follow the on-screen instructions to complete the installation.
+   Follow the on-screen instructions to complete the installation.
 
-2. Open a new terminal or source the SDKMAN! scripts:
+2. Open a new terminal or source the SDKMan! scripts:
 
-```bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-```
+   ```bash
+   source "$HOME/.sdkman/bin/sdkman-init.sh"
+   ```
 
-#### Install GraalVM using SDKMAN
+### 2.2. Install GraalVM using SDKMan
 
 1. You can list all available GraalVM versions with:
 
-```bash
-sdk list java | grep graalvm
-```
+   ```bash
+   sdk list java | grep graalvm
+   ```
 
 2. Install GraalVM 17 (replace 17.x.x with the specific version you want):
 
-```bash
-sdk install java 17.x.x-grl
-```
+   ```bash
+   sdk install java 17.x.x-grl
+   ```
 
 3. Set GraalVM 17 as the current Java version (replace 17.x.x with the specific version you want):
 
-```bash
-sdk use java 17.x.x-grl
-```
+   ```bash
+   sdk use java 17.x.x-grl
+   ```
 
-#### Build the Project
+### 2.3. Build the Project
 
-1. Clone the repository (if you haven't already)
-
-```
-git clone git@github.ibm.com:northstar/codeanalyzer
-cd codeanalyzer
-```
-
-2. Run the Gradle wrapper script to build the project. This will compile the project using GraalVM native image
-   compilation:
+Clone the repository (if you haven't already) and navigate into the cloned directory. Run the Gradle wrapper script to build the project. This will compile the project using GraalVM native image.
 
 ```bash
 ./gradlew nativeCompile -PbinDir=$HOME/.local/bin
@@ -68,7 +62,7 @@ cd codeanalyzer
 
 **Note: `-PbinDir` is optional. If not provided, this command places the binaries in  `build/bin`.**
 
-## Using `codeanalyzer`
+## 3. Using `codeanalyzer`
 
 Assuming the path you provided in `-PbinDir` (in my case `$HOME/.local/bin`) is in your `$PATH`, after installation, you can use `codeanalyzer` by following the below format:
 
