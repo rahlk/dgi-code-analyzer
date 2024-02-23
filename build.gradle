@@ -1,5 +1,5 @@
 /*
-Copyright IBM Corporation 2023
+Copyright IBM Corporation 2024
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -11,24 +11,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-apply plugin: 'java-library'
-apply plugin: 'application'
-apply plugin: 'eclipse'
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'eclipse'
+    id 'application'
+    id 'org.graalvm.buildtools.native' version '0.9.28'
+}
 
-sourceCompatibility = 1.11
-version = '1.0-dev'
+version = '1.0'
 
 repositories {
     mavenCentral()
     mavenLocal()
-    flatDir {
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.util/build/libs'
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.core/build/libs'
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast/build/libs'
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.shrike/build/libs'
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast.java/build/libs'
-        dirs 'lib/WALA-1.5.10/com.ibm.wala.cast.java.ecj/build/libs'
-    }
 }
 
 
@@ -45,23 +39,24 @@ clean.doFirst {
 }
 
 dependencies {
-    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation 'org.apache.commons:commons-math3:3.6.1'
-    implementation 'org.apache.commons:commons-csv:1.8'
+    // PICOCLI for handling commandline interface
+    implementation 'info.picocli:picocli:4.1.0'
+    annotationProcessor 'info.picocli:picocli-codegen:4.1.0'
+
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
     implementation 'commons-io:commons-io:2.8.0'
 
     implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
     implementation 'org.apache.logging.log4j:log4j-core:2.18.0'
-    def walaVersion = '1.5.9'
+    def walaVersion = '1.6.3'
 
-    implementation name: "com.ibm.wala.util-${walaVersion}"
-    implementation name: "com.ibm.wala.core-${walaVersion}"
-    implementation name: "com.ibm.wala.cast-${walaVersion}"
-    implementation name: "com.ibm.wala.shrike-${walaVersion}"
-    implementation name: "com.ibm.wala.cast.java-${walaVersion}"
-    implementation name: "com.ibm.wala.cast.java.ecj-${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.shrike:${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.util:${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.core:${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.cast:${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.cast.java:${walaVersion}"
+    implementation "com.ibm.wala:com.ibm.wala.cast.java.ecj:${walaVersion}"
 
     implementation("org.eclipse.jdt:org.eclipse.jdt.core:3.21.0")
     implementation("org.eclipse.platform:org.eclipse.core.commands:3.9.700")
@@ -69,7 +64,7 @@ dependencies {
     implementation("org.eclipse.platform:org.eclipse.core.expressions:3.7.100")
     implementation("org.eclipse.platform:org.eclipse.core.filesystem:1.9.0")
     implementation("org.eclipse.platform:org.eclipse.core.jobs:3.11.0")
-    implementation("org.eclipse.platform:org.eclipse.core.resources:3.14.0")
+    implementation('org.eclipse.platform:org.eclipse.core.resources:3.20.0')
     implementation("org.eclipse.platform:org.eclipse.core.runtime:3.17.100")
     implementation("org.eclipse.platform:org.eclipse.equinox.app:1.5.100")
     implementation("org.eclipse.platform:org.eclipse.equinox.common:3.14.100")
@@ -78,7 +73,7 @@ dependencies {
     implementation("org.eclipse.platform:org.eclipse.osgi:3.16.300")
     implementation("org.eclipse.platform:org.eclipse.text:3.11.0")
 
-    implementation('org.json:json:20220924')
+    implementation('org.json:json:20231013')
     implementation('org.jgrapht:jgrapht-core:1.5.1')
     implementation('org.jgrapht:jgrapht-io:1.5.1')
     implementation('org.jgrapht:jgrapht-ext:1.5.1')
@@ -87,12 +82,12 @@ dependencies {
 }
 
 task fatjar(type: Jar) {
-    archiveBaseName = 'code2graph'
+    archiveBaseName = 'codeanalyzer'
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes  'Implementation-Title': 'Tackle DGI WALA Code2graph',
-                    'Implementation-Version': archiveVersion,
-                    'Main-Class': 'org.konveyor.dgi.code2graph.Main'
+                'Implementation-Version': archiveVersion,
+                'Main-Class': 'org.konveyor.dgi.CodeAnalyzer'
     }
     from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
@@ -110,9 +105,10 @@ task propertyTypes(){
 
 if (project.hasProperty("args")) {
     ext.cmdargs = project.getProperty("args")
-} else { 
+} else {
     ext.cmdargs = ""
 }
+
 task codeanalyzer(type: JavaExec) {
     group = "Execution"
     description = "WALA code to system dependency graph"
@@ -120,3 +116,67 @@ task codeanalyzer(type: JavaExec) {
     mainClass = mainClassName
     args cmdargs.split()
 }
+
+def getJmodModuleNames() {
+    def jmodsDirPath = "${System.env.JAVA_HOME}/jmods"
+    def jmodsDir = new File(jmodsDirPath)
+
+    if (!jmodsDir.exists() || !jmodsDir.isDirectory()) {
+        throw new GradleException("JMODs directory not found at $jmodsDirPath")
+    }
+
+    def moduleNames = jmodsDir.listFiles(new FilenameFilter() {
+        @Override
+        boolean accept(File dir, String name) {
+            return name.endsWith('.jmod')
+        }
+    }).collect { file ->
+        file.name[0..-6] // Extract the module name from the file name by removing the .jmod extension
+    }.join(',')
+
+    return moduleNames
+}
+
+
+graalvmNative {
+    binaries {
+        main {
+            imageName = "codeanalyzer"
+            mainClass = "org.konveyor.dgi.CodeAnalyzer"
+            buildArgs.add("-Ob")
+            buildArgs.add("-march=native")
+            buildArgs.add("--no-fallback")
+            buildArgs.add("--no-server")
+            buildArgs.add("-H:ReflectionConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/reflect-config.json")
+            buildArgs.add("-H:ResourceConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/resource-config.json")
+            buildArgs.add("-H:JNIConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/jni-config.json")
+            buildArgs.add("-H:DynamicProxyConfigurationFiles=$projectDir/src/main/resources/META-INF/native-image-config/proxy-config.json")
+
+            // Dynamically add modules
+            def jmodModules = getJmodModuleNames()
+            buildArgs.add("--add-modules=$jmodModules")
+        }
+        test {
+            buildArgs.add("-O0")
+        }
+    }
+    binaries.configureEach {
+        buildArgs.add("--verbose")
+    }
+}
+
+// Define a property for the output directory
+def binDir = project.hasProperty('binDir') ? project.property('binDir') : "$buildDir/bin"
+
+// Task to copy the native executable to the specified directory
+task copyNativeExecutable(type: Copy) {
+    dependsOn nativeCompile // Ensure this runs after the native image is built
+
+    // Assuming 'cov2sloc' is the name of your native image
+    from "${buildDir}/native/nativeCompile/codeanalyzer"
+    into binDir
+    // Set executable permission
+    fileMode = 0755
+}
+
+nativeCompile.finalizedBy copyNativeExecutable

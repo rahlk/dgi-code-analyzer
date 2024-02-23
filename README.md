@@ -91,46 +91,10 @@ There are some sample binaries in github.com/rahlk/dgi-sample-applications. As a
 
 This will produce a JSON file called `sdg.json` at `/path/to/dgi-sample-applications/daytrader8/output`.
 
-### 2. For usage as a docker container
-
-A containerized version of code-analyzer is available at quay.io/rkrsn/code-analyzer. As an example usage, we'll 
-again use daytrader8 as shown below:
-
-   ```sh
-   docker run --rm \
-      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/binaries:/binaries \
-      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/libs/:/dependencies \
-      -v /path/to/dgi-sample-applications/daytrader8/daytrader8/output/:/output \
-      quay.io/rkrsn/code-analyzer:latest 
-   ```
-   ```
-   2023-06-15T02:08:35.375035      [INFO]  Create analysis scope.
-   2023-06-15T02:08:35.478729      [INFO]  Add exclusions to scope.
-   2023-06-15T02:08:35.480074      [INFO]  Loading Java SE standard libs.
-   2023-06-15T02:08:35.553166      [INFO]  Loading user specified extra libs.
-   2023-06-15T02:08:35.563673      [INFO]  -> Adding dependency activation-1.1.jar to analysis scope.
-   2023-06-15T02:08:35.574235      [INFO]  -> Adding dependency derby-10.14.2.0.jar to analysis scope.
-   2023-06-15T02:08:35.586332      [INFO]  -> Adding dependency javaee-api-8.0.jar to analysis scope.
-   2023-06-15T02:08:35.597902      [INFO]  -> Adding dependency javax.mail-1.6.0.jar to analysis scope.
-   2023-06-15T02:08:35.607116      [INFO]  -> Adding dependency jaxb-api-2.3.0.jar to analysis scope.
-   2023-06-15T02:08:35.613697      [INFO]  -> Adding dependency standard-1.1.1.jar to analysis scope.
-   2023-06-15T02:08:35.636437      [INFO]  Loading application jar(s).
-   2023-06-15T02:08:35.639916      [INFO]  -> Adding application daytrader8.jar to analysis scope.
-   2023-06-15T02:08:35.647837      [INFO]  Make class hierarchy.
-   2023-06-15T02:08:37.823779      [DONE]  There were a total of 16016 classes of which 155 are application classes.
-   2023-06-15T02:08:37.904373      [INFO]  Registered 1244 entrypoints.
-   2023-06-15T02:08:37.923757      [INFO]  Building call graph.
-   2023-06-15T02:08:47.558413      [DONE]  Finished construction of call graph. Took 10.0 seconds.
-   2023-06-15T02:08:47.559886      [INFO]  Building System Dependency Graph.
-   2023-06-15T02:08:47.574035      [INFO]  Pruning SDG to keep only Application classes.
-   2023-06-15T02:08:50.358856      [DONE]  SDG built and pruned. It has 32120 nodes.
-   2023-06-15T02:08:52.383651      [DONE]  SDG saved at /output
-   ```
-
 ## LICENSE
 
 ```
-Copyright IBM Corporation 2023
+Copyright IBM Corporation 2023, 2024
 
 Licensed under the Apache Public License 2.0, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
